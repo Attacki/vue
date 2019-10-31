@@ -1,30 +1,47 @@
 /* @flow */
 
+// \u则代表unicode编码，是一个字符；
+// 0x开头代表十六进制，实际上就是一个整数；
+// \x对应的是UTF-8编码的数据，通过转化规则可以转换为Unicode编码，就能得到对应的汉字，转换规则很简单，先将\x去掉，转换为数字;
+// 'lang'.charCodeAt(2) == 0x6e
+
+// 有效分割字符的正则表达式
+// []里面的字符都代表自己本身的含义，但有例外，-表示连续的意思（a-z），所以需要转义\-
 const validDivisionCharRE = /[\w).+\-_$\]]/
 
+// 解析过滤器
 export function parseFilters (exp: string): string {
-  let inSingle = false
-  let inDouble = false
-  let inTemplateString = false
-  let inRegex = false
+  let inSingle = false  //单引号
+  let inDouble = false  //双引号
+  let inTemplateString = false //模版字符串
+  let inRegex = false   //正则表达式
   let curly = 0
   let square = 0
   let paren = 0
   let lastFilterIndex = 0
   let c, prev, i, expression, filters
 
+  // 0x5C => \
+  // 0x2f => /
+  // 0x7c => |
+
   for (i = 0; i < exp.length; i++) {
     prev = c
     c = exp.charCodeAt(i)
     if (inSingle) {
+      // ' && \
       if (c === 0x27 && prev !== 0x5C) inSingle = false
     } else if (inDouble) {
+      // " && \
       if (c === 0x22 && prev !== 0x5C) inDouble = false
     } else if (inTemplateString) {
+      // ` && \
       if (c === 0x60 && prev !== 0x5C) inTemplateString = false
     } else if (inRegex) {
+      // / && \
       if (c === 0x2f && prev !== 0x5C) inRegex = false
     } else if (
+      // | && \
       c === 0x7C && // pipe
       exp.charCodeAt(i + 1) !== 0x7C &&
       exp.charCodeAt(i - 1) !== 0x7C &&

@@ -40,31 +40,22 @@ export default ({
    * Option merge strategies (used in core/util/options)
    */
   // $flow-disable-line
+  // 
   optionMergeStrategies: Object.create(null),
 
-  /**
-   * Whether to suppress warnings.
-   */
+  // 取消警告
   silent: false,
 
-  /**
-   * Show production mode tip message on boot?
-   */
+  // 加载时，显示生产提示
   productionTip: process.env.NODE_ENV !== 'production',
 
-  /**
-   * Whether to enable devtools
-   */
+  // 开启调试工具
   devtools: process.env.NODE_ENV !== 'production',
 
-  /**
-   * Whether to record perf
-   */
+  // 记录性能表现
   performance: false,
 
-  /**
-   * Error handler for watcher errors
-   */
+  // 监视错误的处理
   errorHandler: null,
 
   /**

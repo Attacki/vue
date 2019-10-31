@@ -3,11 +3,13 @@
 import { inBrowser } from 'core/util/env'
 import { makeMap } from 'shared/util'
 
+// 标签类型空间列表
 export const namespaceMap = {
   svg: 'http://www.w3.org/2000/svg',
   math: 'http://www.w3.org/1998/Math/MathML'
 }
 
+// html标签判断
 export const isHTMLTag = makeMap(
   'html,body,base,head,link,meta,style,title,' +
   'address,article,aside,footer,header,h1,h2,h3,h4,h5,h6,hgroup,nav,section,' +
@@ -31,12 +33,15 @@ export const isSVG = makeMap(
   true
 )
 
+// 判断是否是pre标签
 export const isPreTag = (tag: ?string): boolean => tag === 'pre'
 
+// 判断是否是被浏览器使用tag
 export const isReservedTag = (tag: string): ?boolean => {
   return isHTMLTag(tag) || isSVG(tag)
 }
 
+// 获取标签类型空间
 export function getTagNamespace (tag: string): ?string {
   if (isSVG(tag)) {
     return 'svg'
@@ -48,7 +53,9 @@ export function getTagNamespace (tag: string): ?string {
   }
 }
 
+// element缓存列表
 const unknownElementCache = Object.create(null)
+// 判断标签是否是新建的tag  例如自定义组件名称，就是另一个tag
 export function isUnknownElement (tag: string): boolean {
   /* istanbul ignore if */
   if (!inBrowser) {

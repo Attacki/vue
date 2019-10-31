@@ -9,9 +9,10 @@ export * from './element'
 /**
  * Query an element selector if it's not an element already.
  */
+
 export function query (el: string | Element): Element {
   if (typeof el === 'string') {
-    const selected = document.querySelector(el)
+    const selected = document.querySelector(el) //根据el属性，获取dom模版
     if (!selected) {
       process.env.NODE_ENV !== 'production' && warn(
         'Cannot find element: ' + el

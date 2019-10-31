@@ -23,6 +23,7 @@ if (process.argv[2]) {
   })
 }
 
+// 如果不传递编译文件的参数，默认会把所有的版本都进行编译
 build(builds)
 
 function build (builds) {

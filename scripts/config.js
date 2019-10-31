@@ -7,8 +7,9 @@ const node = require('rollup-plugin-node-resolve')
 const flow = require('rollup-plugin-flow-no-whitespace')
 const version = process.env.VERSION || require('../package.json').version
 const weexVersion = process.env.WEEX_VERSION || require('../packages/weex-vue-framework/package.json').version
-const featureFlags = require('./feature-flags')
 
+
+// Vuejs标识
 const banner =
   '/*!\n' +
   ` * Vue.js v${version}\n` +
@@ -25,7 +26,25 @@ const weexFactoryPlugin = {
   }
 }
 
-const aliases = require('./alias')
+
+/* 
+ *  根据不同命令获取运行时文件的绝对路径
+*/
+
+// 定义编译方式的文件夹，根据对应的相对路径来获取绝对路径
+const handlePath = p => path.resolve(__dirname, '../', p)
+const aliases = {
+  vue: handlePath('src/platforms/web/entry-runtime-with-compiler'),
+  compiler: handlePath('src/compiler'),
+  core: handlePath('src/core'),
+  shared: handlePath('src/shared'),
+  web: handlePath('src/platforms/web'),
+  weex: handlePath('src/platforms/weex'),
+  server: handlePath('src/server'),
+  sfc: handlePath('src/sfc')
+}
+
+// 上面只是获取文件夹路径，需要确定是编译哪一个文件
 const resolve = p => {
   const base = p.split('/')[0]
   if (aliases[base]) {
@@ -35,8 +54,10 @@ const resolve = p => {
   }
 }
 
+// 所有可构建方式
 const builds = {
-  // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  // 常常被webpack或者browserify用来构建开发的vuejs版本，不支持模版编译
+  // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify  
   'web-runtime-cjs-dev': {
     entry: resolve('web/entry-runtime.js'),
     dest: resolve('dist/vue.runtime.common.dev.js'),
@@ -44,6 +65,7 @@ const builds = {
     env: 'development',
     banner
   },
+  // 与上面相同，不过是压缩版本的
   'web-runtime-cjs-prod': {
     entry: resolve('web/entry-runtime.js'),
     dest: resolve('dist/vue.runtime.common.prod.js'),
@@ -51,6 +73,7 @@ const builds = {
     env: 'production',
     banner
   },
+  // 单页面应用开发时使用
   // Runtime+compiler CommonJS build (CommonJS)
   'web-full-cjs-dev': {
     entry: resolve('web/entry-runtime-with-compiler.js'),
@@ -68,6 +91,7 @@ const builds = {
     alias: { he: './entity-decoder' },
     banner
   },
+  // 为打包插件提供的版本（只支持运行不支持编译），只支持es模块规范
   // Runtime only ES modules build (for bundlers)
   'web-runtime-esm': {
     entry: resolve('web/entry-runtime.js'),
@@ -75,6 +99,7 @@ const builds = {
     format: 'es',
     banner
   },
+  // 为打包插件提供的版本（支持运行和编译），只支持es模块规范
   // Runtime+compiler ES modules build (for bundlers)
   'web-full-esm': {
     entry: resolve('web/entry-runtime-with-compiler.js'),
@@ -213,6 +238,7 @@ const builds = {
   }
 }
 
+//获取构建配置
 function genConfig (name) {
   const opts = builds[name]
   const config = {
@@ -234,27 +260,33 @@ function genConfig (name) {
       }
     }
   }
-
-  // built-in vars
-  const vars = {
+ 
+  const vars = { // 定义版本等属性
     __WEEX__: !!opts.weex,
     __WEEX_VERSION__: weexVersion,
     __VERSION__: version
   }
-  // feature flags
+  // 特性标识
+  const featureFlags = {
+    NEW_SLOT_SYNTAX: true,
+    VBIND_PROP_SHORTHAND: false
+  }
   Object.keys(featureFlags).forEach(key => {
     vars[`process.env.${key}`] = featureFlags[key]
   })
-  // build-specific env
+  // 构建环境
   if (opts.env) {
     vars['process.env.NODE_ENV'] = JSON.stringify(opts.env)
   }
+  // 打包时对文件中的对应字符串进行替换，比如把 __VERSION__ 替换为 2.0.0
   config.plugins.push(replace(vars))
 
+  // 转换为es6
   if (opts.transpile !== false) {
     config.plugins.push(buble())
   }
 
+  // 为config设置一个不可枚举的属性
   Object.defineProperty(config, '_name', {
     enumerable: false,
     value: name
@@ -263,6 +295,7 @@ function genConfig (name) {
   return config
 }
 
+// 如果指定了运行时参数的目标文件，编译方式会有不同
 if (process.env.TARGET) {
   module.exports = genConfig(process.env.TARGET)
 } else {
