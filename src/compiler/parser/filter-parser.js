@@ -11,25 +11,27 @@ const validDivisionCharRE = /[\w).+\-_$\]]/
 
 // 解析过滤器
 export function parseFilters (exp: string): string {
+  // exp = "'start.count:'+start.count"
   let inSingle = false  //单引号
   let inDouble = false  //双引号
   let inTemplateString = false //模版字符串
   let inRegex = false   //正则表达式
-  let curly = 0
-  let square = 0
-  let paren = 0
+  let curly = 0    // 不是{}
+  let square = 0   // 不是[]
+  let paren = 0    // 不是()
   let lastFilterIndex = 0
   let c, prev, i, expression, filters
 
+
+  // 这里的所有关于 "" '' {} () []的检测都是为了防止干扰 | ，防止filter的内容出现问题
   // 0x5C => \
   // 0x2f => /
   // 0x7c => |
-
   for (i = 0; i < exp.length; i++) {
     prev = c
     c = exp.charCodeAt(i)
     if (inSingle) {
-      // ' && \
+      // ' && \   \这里是为了防止正则中的转义
       if (c === 0x27 && prev !== 0x5C) inSingle = false
     } else if (inDouble) {
       // " && \
@@ -38,14 +40,14 @@ export function parseFilters (exp: string): string {
       // ` && \
       if (c === 0x60 && prev !== 0x5C) inTemplateString = false
     } else if (inRegex) {
-      // / && \
+      // / && \  
       if (c === 0x2f && prev !== 0x5C) inRegex = false
     } else if (
-      // | && \
+      // |  这个代表的就是filter的使用方法啊
       c === 0x7C && // pipe
       exp.charCodeAt(i + 1) !== 0x7C &&
       exp.charCodeAt(i - 1) !== 0x7C &&
-      !curly && !square && !paren
+      !curly && !square && !paren   // 例如： paren默认是0 ( 会让 paren++  )会让paren--  这样就保证了一个完整的()，!paren应当保证是false，这样就可以继续向下判断，直到获取了expression。
     ) {
       if (expression === undefined) {
         // first filter, end of expression
@@ -69,12 +71,12 @@ export function parseFilters (exp: string): string {
       if (c === 0x2f) { // /
         let j = i - 1
         let p
-        // find first non-whitespace prev char
+        // 查找第一个不是空格的上一个字符
         for (; j >= 0; j--) {
           p = exp.charAt(j)
           if (p !== ' ') break
         }
-        if (!p || !validDivisionCharRE.test(p)) {
+        if (!p || !/[\w).+\-_$\]]/.test(p)) {
           inRegex = true
         }
       }
