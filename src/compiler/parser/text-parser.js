@@ -1,5 +1,7 @@
 /* @flow */
 
+// 对定界符中的文本进行处理
+
 import { cached } from 'shared/util'
 import { parseFilters } from './filter-parser'
 

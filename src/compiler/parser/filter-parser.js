@@ -23,10 +23,12 @@ export function parseFilters (exp: string): string {
   let c, prev, i, expression, filters
 
 
-  // 这里的所有关于 "" '' {} () []的检测都是为了防止干扰 | ，防止filter的内容出现问题
+  // 这里的所有关于 "" '' {} () []的检测都是为了防止干扰 | 的判断，防止filter的内容出现问题
   // 0x5C => \
   // 0x2f => /
   // 0x7c => |
+
+  // 这里的for循环就是为了处理所有的符号的 例如： [](){}\|/'"`
   for (i = 0; i < exp.length; i++) {
     prev = c
     c = exp.charCodeAt(i)
@@ -40,12 +42,12 @@ export function parseFilters (exp: string): string {
       // ` && \
       if (c === 0x60 && prev !== 0x5C) inTemplateString = false
     } else if (inRegex) {
-      // / && \  
-      if (c === 0x2f && prev !== 0x5C) inRegex = false
+      // / && \  不让\转义/
+      if (c === 0x2f && prev !== 0x5C) inRegex = false  //进到个条件，表示正则 / ... / 已经闭合
     } else if (
-      // |  这个代表的就是filter的使用方法啊
-      c === 0x7C && // pipe
-      exp.charCodeAt(i + 1) !== 0x7C &&
+      // |  这个代表的就是filter的使用方法
+      c === 0x7C && // |
+      exp.charCodeAt(i + 1) !== 0x7C && //排除 ||
       exp.charCodeAt(i - 1) !== 0x7C &&
       !curly && !square && !paren   // 例如： paren默认是0 ( 会让 paren++  )会让paren--  这样就保证了一个完整的()，!paren应当保证是false，这样就可以继续向下判断，直到获取了expression。
     ) {
@@ -71,21 +73,30 @@ export function parseFilters (exp: string): string {
       if (c === 0x2f) { // /
         let j = i - 1
         let p
-        // 查找第一个不是空格的上一个字符
+        // 从当前字符的上一个字符向前开始查找，第一个不是空格的字符
         for (; j >= 0; j--) {
           p = exp.charAt(j)
           if (p !== ' ') break
         }
-        if (!p || !/[\w).+\-_$\]]/.test(p)) {
+        if (!p || !/[\w).+\-_$\]]/.test(p)) { //这里的inRegex标志不能随意更改，因为会改变表达式语义
+          //  \w 可能是变量名，数字或_，当前的/可能表示的是除法
+          //  . 同上，还是有可能把/当作除法运算符
+          //  + 可能是拼接字符串
+          //  - 数学运算，会转化正则为NaN
+          //  _ 可能是变量名
+          //  $ 可能是变量名
+          //  ])会导致表达式，这里判断是为了保证表达式的格式正确，所以如果是[(之类的字符，就可以进入正则
           inRegex = true
         }
       }
     }
   }
 
+  // 说明没有filter 这个时候可以获取表达式
   if (expression === undefined) {
     expression = exp.slice(0, i).trim()
   } else if (lastFilterIndex !== 0) {
+  //  如果有表达式，说明有filter
     pushFilter()
   }
 
@@ -93,9 +104,10 @@ export function parseFilters (exp: string): string {
     (filters || (filters = [])).push(exp.slice(lastFilterIndex, i).trim())
     lastFilterIndex = i + 1
   }
-
+  // 如果lastFilterIndex没有改变
   if (filters) {
     for (i = 0; i < filters.length; i++) {
+      // 不断的把表达式递归嵌套 
       expression = wrapFilter(expression, filters[i])
     }
   }

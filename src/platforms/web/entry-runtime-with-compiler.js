@@ -7,7 +7,7 @@ import { mark, measure } from 'core/util/perf'  // 测试组件渲染所需时�
 import Vue from './runtime/index'
 import { query } from './util/index'  // 根据el获取dom模版
 import { compileToFunctions } from './compiler/index'  // 模版编译为函数
-import { shouldDecodeNewlines, shouldDecodeNewlinesForHref } from './util/compat' // ie在属性值中编码新行，而其他浏览器则不编码
+import { shouldDecodeNewlines, shouldDecodeNewlinesForHref } from './util/compat' // ie在a标签的href属性值中需要另起一行，而其他浏览器则不用
 
 // 根据el获取dom模版
 const idToTemplate = cached(id => {
@@ -15,7 +15,7 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 
-// 如果没有传递el属性，就要自己使用$mount进行挂载
+// 如果没有传递el属性，就要自己使用$mount方法进行挂载
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (
   el?: string | Element,
@@ -23,7 +23,6 @@ Vue.prototype.$mount = function (
 ): Component {
   el = el && query(el)
 
-  /* istanbul ignore if */
   // 不允许模版为body或者documentElement
   if (el === document.body || el === document.documentElement) {
     process.env.NODE_ENV !== 'production' && warn(
@@ -31,7 +30,7 @@ Vue.prototype.$mount = function (
     )
     return this
   }
-  // 获取用户设置的实例属性
+  // 获取用户传入的实例属性参数
   const options = this.$options
   
   // 根据template或者el，获取内容字符串，并且转换成渲染函数
