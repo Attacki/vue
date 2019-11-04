@@ -31,32 +31,33 @@ export function parseText (
   if (!tagRE.test(text)) {  // 是否复合定界符规则
     return
   }
-  const tokens = []
-  const rawTokens = []
-  let lastIndex = tagRE.lastIndex = 0
+  const tokens = [] 
+  const rawTokens = []  // 未经处理的token
+  let lastIndex = tagRE.lastIndex = 0   //重置正则的lastIndex
   let match, index, tokenValue
-  // 假如text是 "{{start.count}} ++ {{love}}"
+  // 假如text是 "{{start.count}} 其他文本 {{love}}"
   while ((match = tagRE.exec(text))) {
-    index = match.index // 匹配成功的起始位置
-    // push text token
+    index = match.index // {{start.count}}匹配成功的起始位置
+    // 这里的lastIndex还是上一次匹配结果的尾部序号，如果新一次的匹配index大于lastIndex，说明在中间有其他内容
+    // 把 "其他文本" 添加进处理的token
     if (index > lastIndex) {
       rawTokens.push(tokenValue = text.slice(lastIndex, index))
-      tokens.push(JSON.stringify(tokenValue))
+      tokens.push(JSON.stringify(tokenValue)) //将文本转化为字符串，方便后面的表达式的拼接
     }
-    // tag token
-    const exp = parseFilters(match[1].trim()) // start.count
+    // 需要对token进行包裹
+    const exp = parseFilters(match[1].trim()) // start.count    对该表达式进行 filter的处理，最后再返回表达式
     tokens.push(`_s(${exp})`)
     rawTokens.push({ '@binding': exp })
-    lastIndex = index + match[0].length
+    lastIndex = index + match[0].length // 此时lastIndex已经被改变了，此时为15
   }
-  // tookens ["_s(start.count)", "" ++ "", "_s(love)"]
-  // rawTokens [{@binding: "start.count"},"++",{@binding: "love"}]
-  if (lastIndex < text.length) {
+  // tookens ["_s(start.count)", "" 其他文本 "", "_s(love)"]
+  // rawTokens [{@binding: "start.count"},"其他文本",{@binding: "love"}]
+  if (lastIndex < text.length) {  //把剩余的内容再次追加进token
     rawTokens.push(tokenValue = text.slice(lastIndex))
     tokens.push(JSON.stringify(tokenValue))
   }
   return {
-    expression: tokens.join('+'),
+    expression: tokens.join('+'), //最终表达式
     tokens: rawTokens
   }
 }

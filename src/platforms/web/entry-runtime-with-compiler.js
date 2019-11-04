@@ -74,9 +74,9 @@ Vue.prototype.$mount = function (
       const { render, staticRenderFns } = compileToFunctions(template, {
         outputSourceRange: process.env.NODE_ENV !== 'production',
         shouldDecodeNewlines,
-        shouldDecodeNewlinesForHref,
-        delimiters: options.delimiters,
-        comments: options.comments
+        shouldDecodeNewlinesForHref, // ie在a标签的href属性值中需要另起一行，而其他浏览器则不用
+        delimiters: options.delimiters, //用户设置了delimiters
+        comments: options.comments  //当设为 true 时，将会保留且渲染模板中的 HTML 注释。默认行为是舍弃它们。
       }, this)
       options.render = render
       options.staticRenderFns = staticRenderFns

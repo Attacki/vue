@@ -26,25 +26,25 @@ import {
 function preTransformNode (el: ASTElement, options: CompilerOptions) {
   if (el.tag === 'input') {
     const map = el.attrsMap
-    if (!map['v-model']) {
+    if (!map['v-model']) {  // 如果没有v-model 就中断
       return
     }
 
     let typeBinding
-    if (map[':type'] || map['v-bind:type']) {
-      typeBinding = getBindingAttr(el, 'type')
+    if (map[':type'] || map['v-bind:type']) { // 如果用户在标签上写的属性名是 :type 或者 v-bind:type  
+      typeBinding = getBindingAttr(el, 'type')  // 获取该元素节点bind的type属性值
     }
-    if (!map.type && !typeBinding && map['v-bind']) {
+    if (!map.type && !typeBinding && map['v-bind']) { // 如果没有设置类型，也没有bind该元素的type属性
       typeBinding = `(${map['v-bind']}).type`
     }
 
     if (typeBinding) {
-      const ifCondition = getAndRemoveAttr(el, 'v-if', true)
-      const ifConditionExtra = ifCondition ? `&&(${ifCondition})` : ``
-      const hasElse = getAndRemoveAttr(el, 'v-else', true) != null
-      const elseIfCondition = getAndRemoveAttr(el, 'v-else-if', true)
+      const ifCondition = getAndRemoveAttr(el, 'v-if', true)  // 判断是否有v-if属性，并且在dom中去掉该属性，所以在重新渲染的dom中并没有v-系列的属性
+      const ifConditionExtra = ifCondition ? `&&(${ifCondition})` : ``  // 如果有v-if 
+      const hasElse = getAndRemoveAttr(el, 'v-else', true) != null      // 如果有v-else
+      const elseIfCondition = getAndRemoveAttr(el, 'v-else-if', true)   // 如果有v-else-if 
       // 1. checkbox
-      const branch0 = cloneASTElement(el)
+      const branch0 = cloneASTElement(el)   // 克隆一个节点
       // process for on the main node
       processFor(branch0)
       addRawAttr(branch0, 'type', 'checkbox')

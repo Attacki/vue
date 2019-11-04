@@ -21,27 +21,34 @@ import {
   getAndRemoveAttrByRegex
 } from '../helpers'
 
-export const onRE = /^@|^v-on:/
-export const dirRE = process.env.VBIND_PROP_SHORTHAND
+export const onRE = /^@|^v-on:/   // 绑定事件
+export const dirRE = process.env.VBIND_PROP_SHORTHAND   // 绑定指令
   ? /^v-|^@|^:|^\.|^#/
   : /^v-|^@|^:|^#/
-export const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
-export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
-const stripParensRE = /^\(|\)$/g
-const dynamicArgRE = /^\[.*\]$/
+export const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/  // 例如： v-for = " item in ary "  分组1捕获" item" 分组2因为(?: -- )的格式不会保存捕获到的内容 分组3捕获"ary"
+export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/   // 迭代器的正则
+const stripParensRE = /^\(|\)$/g  // '('或者')'的匹配
+const dynamicArgRE = /^\[.*\]$/   //  [**]的匹配
 
-const argRE = /:(.*)$/
-export const bindRE = /^:|^\.|^v-bind:/
+const argRE = /:(.*)$/  //对参数的匹配
+export const bindRE = /^:|^\.|^v-bind:/ // v-bind的匹配
 const propBindRE = /^\./
-const modifierRE = /\.[^.\]]+(?=[^\]]*$)/g
+const modifierRE = /\.[^.\]]+(?=[^\]]*$)/g  
 
-const slotRE = /^v-slot(:|$)|^#/
+const slotRE = /^v-slot(:|$)|^#/   
 
-const lineBreakRE = /[\r\n]/
-const whitespaceRE = /\s+/g
+const lineBreakRE = /[\r\n]/  // 换行匹配
+const whitespaceRE = /\s+/g   // 空格匹配
 
-const invalidAttributeRE = /[\s"'<>\/=]/
+const invalidAttributeRE = /[\s"'<>\/=]/   // 有效的属性名不能包含的字符
 
+// he其实是 html entities的缩写，大致的作用
+// he.encode('foo © bar ≠ baz 𝌆 qux');
+// → 'foo &#xA9; bar &#x2260; baz &#x1D306; qux'
+// he.decode('foo&ampbar'); // "&amp"就是"&"的意思
+// → 'foo&bar'
+
+// 对解码过的html进行缓存
 const decodeHTMLCached = cached(he.decode)
 
 export const emptySlotScopeToken = `_empty_`

@@ -6,9 +6,7 @@ export * from './attrs'
 export * from './class'
 export * from './element'
 
-/**
- * Query an element selector if it's not an element already.
- */
+// 查找一个element元素
 
 export function query (el: string | Element): Element {
   if (typeof el === 'string') {

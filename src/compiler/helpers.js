@@ -6,10 +6,13 @@ import { parseFilters } from './parser/filter-parser'
 type Range = { start?: number, end?: number };
 
 /* eslint-disable no-unused-vars */
+
+// Vue编译报错信息
 export function baseWarn (msg: string, range?: Range) {
   console.error(`[Vue compiler]: ${msg}`)
 }
 /* eslint-enable no-unused-vars */
+
 
 export function pluckModuleFunction<F: Function> (
   modules: ?Array<Object>,
@@ -158,11 +161,13 @@ export function getRawBindingAttr (
     el.rawAttrsMap[name]
 }
 
+// 获取绑定属性
 export function getBindingAttr (
   el: ASTElement,
   name: string,
   getStatic?: boolean
 ): ?string {
+  // 动态的值
   const dynamicValue =
     getAndRemoveAttr(el, ':' + name) ||
     getAndRemoveAttr(el, 'v-bind:' + name)
@@ -176,10 +181,9 @@ export function getBindingAttr (
   }
 }
 
-// note: this only removes the attr from the Array (attrsList) so that it
-// doesn't get processed by processAttrs.
-// By default it does NOT remove it from the map (attrsMap) because the map is
-// needed during codegen.
+// note: 这只会从数组（attrsList）中移除attr，以便不会被processAttrs处理。
+// 默认情况下，它不会从映射中移除它（attrsMap），因为在codegen期间需要映射。
+
 export function getAndRemoveAttr (
   el: ASTElement,
   name: string,

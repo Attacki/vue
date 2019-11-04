@@ -96,6 +96,7 @@ export function makeMap (
 ): (key: string) => true | void {
   // &和|本是位运算符，之所以可以进行"逻辑运算"，是由于JS是无类型的语言、各数据类型可以自由转换这一特性决定的，
   // 当用&和|进行"逻辑运算"时，实际上true被转换成1，false被转换成0，再进行逐位运算
+  // Object.create(null)区别于直接{}，这样生成的对象没有上级作用域，因此没有Object原型上的toString，valueOf等方法。在框架中使用的好处是减少可能的全局污染带来的影响，因为作者会实现自己的toString这些方法。
   const map = Object.create(null)
   const list: Array<string> = str.split(',')
   for (let i = 0; i < list.length; i++) {

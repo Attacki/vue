@@ -2,7 +2,7 @@
 
 import {
     isPreTag,  // 是否是pre标签
-    mustUseProp, // 必须使用Prop
+    mustUseProp, // 判断是否必须被保留的prop，例如 video的muted属性，作用是静音
     isReservedTag, // 被浏览器保留的标签
     getTagNamespace  // 获取标签命名空间，svg和math
 } from '../util/index'
