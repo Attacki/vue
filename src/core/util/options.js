@@ -26,6 +26,7 @@ import {
  * how to merge a parent option value and a child option
  * value into the final value.
  */
+// 合并策略，如何将parent和child的option选项合并
 const strats = config.optionMergeStrategies
 
 /**
@@ -267,23 +268,25 @@ const defaultStrat = function (parentVal: any, childVal: any): any {
     : childVal
 }
 
-/**
- * Validate component names
- */
+// 检查机甲所有部件
 function checkComponents (options: Object) {
   for (const key in options.components) {
     validateComponentName(key)
   }
 }
 
+// 检测Vue机甲里面各个部件的名字是否规范 （Vue.options.components）
 export function validateComponentName (name: string) {
   if (!new RegExp(`^[a-zA-Z][\\-\\.0-9_${unicodeRegExp.source}]*$`).test(name)) {
+    // 遵循W3C规范中的自定义组件名 (字母全小写且必须包含一个连字符)，避免和当前以及未来的 HTML 元素相冲突
     warn(
+      // 组件名称应符合HTML5规范中的有效自定义元素名。
       'Invalid component name: "' + name + '". Component names ' +
       'should conform to valid custom element name in html5 specification.'
     )
   }
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
+    // 已经被使用的
     warn(
       'Do not use built-in or reserved HTML elements as component ' +
       'id: ' + name
@@ -291,10 +294,7 @@ export function validateComponentName (name: string) {
   }
 }
 
-/**
- * Ensure all props option syntax are normalized into the
- * Object-based format.
- */
+// 确保所有的props语法都是规范的基于对象的格式
 function normalizeProps (options: Object, vm: ?Component) {
   const props = options.props
   if (!props) return
@@ -305,6 +305,7 @@ function normalizeProps (options: Object, vm: ?Component) {
     while (i--) {
       val = props[i]
       if (typeof val === 'string') {
+        // 使用数组来传递props时，父组件传递进子组件的属性名必须是字符串
         name = camelize(val)
         res[name] = { type: null }
       } else if (process.env.NODE_ENV !== 'production') {
@@ -312,6 +313,7 @@ function normalizeProps (options: Object, vm: ?Component) {
       }
     }
   } else if (isPlainObject(props)) {
+    // 使用对象来传递props
     for (const key in props) {
       val = props[key]
       name = camelize(key)
@@ -320,6 +322,7 @@ function normalizeProps (options: Object, vm: ?Component) {
         : { type: val }
     }
   } else if (process.env.NODE_ENV !== 'production') {
+    // 只能使用对象或者数组来传递props
     warn(
       `Invalid value for option "props": expected an Array or an Object, ` +
       `but got ${toRawType(props)}.`,
@@ -329,9 +332,7 @@ function normalizeProps (options: Object, vm: ?Component) {
   options.props = res
 }
 
-/**
- * Normalize all injections into Object-based format
- */
+// 规范所有的数据注入都是基于对象的格式
 function normalizeInject (options: Object, vm: ?Component) {
   const inject = options.inject
   if (!inject) return
@@ -356,9 +357,7 @@ function normalizeInject (options: Object, vm: ?Component) {
   }
 }
 
-/**
- * Normalize raw function directives into object format.
- */
+// 规范所有的指令都是基于对象的格式
 function normalizeDirectives (options: Object) {
   const dirs = options.directives
   if (dirs) {
@@ -391,6 +390,7 @@ export function mergeOptions (
   vm?: Component
 ): Object {
   if (process.env.NODE_ENV !== 'production') {
+    // 合并之前先看看子组件名称是否规范
     checkComponents(child)
   }
 

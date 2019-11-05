@@ -13,7 +13,7 @@ export function baseWarn (msg: string, range?: Range) {
 }
 /* eslint-enable no-unused-vars */
 
-
+// 将对应模块中具有的属性值都给取出来，例如 modules数组中的元素都有一个key函数可用，那就把数组所有元素的key函数，都取出来放在数组中，再返回
 export function pluckModuleFunction<F: Function> (
   modules: ?Array<Object>,
   key: string

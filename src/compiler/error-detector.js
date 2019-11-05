@@ -62,8 +62,9 @@ function checkNode (node: ASTNode, warn: Function) {
   }
 }
 
+
+// 检查事件命名是否规范
 function checkEvent (exp: string, text: string, warn: Function, range?: Range) {
-  // 
   const stripped = exp.replace(stripStringRE, '')   //先将所有的字符串转化为空
   const keywordMatch: any = stripped.match(unaryOperatorsRE)  // 然后再进行关键字的检测
   if (keywordMatch && stripped.charAt(keywordMatch.index - 1) !== '$') {
@@ -76,6 +77,7 @@ function checkEvent (exp: string, text: string, warn: Function, range?: Range) {
   checkExpression(exp, text, warn, range)
 }
 
+// 检查节点
 function checkFor (node: ASTElement, text: string, warn: Function, range?: Range) {
   checkExpression(node.for || '', text, warn, range)
   checkIdentifier(node.alias, 'v-for alias', text, warn, range)
@@ -99,6 +101,7 @@ function checkIdentifier (
   }
 }
 
+
 function checkExpression (exp: string, text: string, warn: Function, range?: Range) {
   try {
     new Function(`return ${exp}`)
@@ -121,6 +124,7 @@ function checkExpression (exp: string, text: string, warn: Function, range?: Ran
   }
 }
 
+// 检查函数式参数表达式
 function checkFunctionParameterExpression (exp: string, text: string, warn: Function, range?: Range) {
   try {
     new Function(exp, '')

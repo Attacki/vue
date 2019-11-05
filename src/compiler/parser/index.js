@@ -64,37 +64,39 @@ let platformMustUseProp
 let platformGetTagNamespace
 let maybeComponent
 
+// 根据标签名，属性集合，还有父节点，生成一个ast元素
 export function createASTElement (
   tag: string,
   attrs: Array<ASTAttr>,
   parent: ASTElement | void
 ): ASTElement {
   return {
-    type: 1,
-    tag,
-    attrsList: attrs,
-    attrsMap: makeAttrsMap(attrs),
-    rawAttrsMap: {},
-    parent,
-    children: []
+    type: 1,  // element元素
+    tag,  // 标签名
+    attrsList: attrs, // 标签包含属性列表
+    attrsMap: makeAttrsMap(attrs),  //属性映射集合
+    rawAttrsMap: {},  // 被处理过的映射集合
+    parent, // 父级节点
+    children: []  //子级节点
   }
 }
 
-/**
- * Convert HTML string to AST.
- */
+
+// 转化html字符串为ast树
 export function parse (
   template: string,
   options: CompilerOptions
 ): ASTElement | void {
-  warn = options.warn || baseWarn
+  warn = options.warn || baseWarn // 获取warn函数
 
-  platformIsPreTag = options.isPreTag || no
-  platformMustUseProp = options.mustUseProp || no
-  platformGetTagNamespace = options.getTagNamespace || no
-  const isReservedTag = options.isReservedTag || no
-  maybeComponent = (el: ASTElement) => !!el.component || !isReservedTag(el.tag)
+  platformIsPreTag = options.isPreTag || no //是否是pre标签
+  platformMustUseProp = options.mustUseProp || no //是否是对当前标签有特殊含义的属性
+  platformGetTagNamespace = options.getTagNamespace || no //获取标签命名空间  svg还是math
+  const isReservedTag = options.isReservedTag || no //是否是被保留的标签
+  maybeComponent = (el: ASTElement) => !!el.component || !isReservedTag(el.tag) //判断是否是组件，并且组件名称是否是被浏览器器保留的标签
 
+  // 有很多transformNode方法的，例如style ，class等文件都有transformNode方法。
+  // 所以需要把所有的方法都提取出来，统一执行，下同
   transforms = pluckModuleFunction(options.modules, 'transformNode')
   preTransforms = pluckModuleFunction(options.modules, 'preTransformNode')
   postTransforms = pluckModuleFunction(options.modules, 'postTransformNode')
@@ -110,6 +112,7 @@ export function parse (
   let inPre = false
   let warned = false
 
+  // 只警告一次 ，防止警告内容太多，眼花
   function warnOnce (msg, range) {
     if (!warned) {
       warned = true
@@ -117,6 +120,7 @@ export function parse (
     }
   }
 
+  // 关闭元素
   function closeElement (element) {
     trimEndingWhitespace(element)
     if (!inVPre && !element.processed) {
@@ -177,6 +181,7 @@ export function parse (
     }
   }
 
+  // 清空尾部空格
   function trimEndingWhitespace (el) {
     // remove trailing whitespace node
     if (!inPre) {
@@ -191,6 +196,7 @@ export function parse (
     }
   }
 
+  // 检查约束条件
   function checkRootConstraints (el) {
     if (el.tag === 'slot' || el.tag === 'template') {
       warnOnce(
@@ -208,6 +214,7 @@ export function parse (
     }
   }
 
+  // 解析Html模版
   parseHTML(template, {
     warn,
     expectHTML: options.expectHTML,
