@@ -9,15 +9,16 @@ import { warn } from '../util/index'
 // Vue机械大心脏，一切的荣耀辉煌就从这里开始吧！ 
 function Vue (options) {
   if (process.env.NODE_ENV !== 'production' &&
-    // Vue是一个构造函数，是一个制造机械的工厂，=.= ， 不可以直接运行哦！
+    // Vue是一个构造函数，是一个制造机甲的工厂，=.= ， 不可以直接运行哦！
     !(this instanceof Vue)
   ) {
     warn('Vue is a constructor and should be called with the `new` keyword')
   }
-  // 初始化配置
+  // 根据用户需求，开始制造机甲了
   this._init(options)
 }
 
+// 为机甲内置该有的配置，data，props，state，event等等
 initMixin(Vue)
 stateMixin(Vue)
 eventsMixin(Vue)
