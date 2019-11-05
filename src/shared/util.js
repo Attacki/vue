@@ -216,7 +216,7 @@ export function toObject (arr: Array<any>): Object {
 
 /* eslint-disable no-unused-vars */
 
-//  空操作
+//  空操作 只是为了占位
 export function noop (a?: any, b?: any, c?: any) {}
 
 // 总返回false
