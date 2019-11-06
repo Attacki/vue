@@ -324,6 +324,7 @@ export function stateMixin (Vue: Class<Component>) {
   propsDef.get = function () { return this._props }
   if (process.env.NODE_ENV !== 'production') {
     dataDef.set = function () {
+      // 不要尝试更改实例的data对象，因为数据劫持，还有监听都是针对这个对象的
       warn(
         'Avoid replacing instance root $data. ' +
         'Use nested data properties instead.',
@@ -331,22 +332,24 @@ export function stateMixin (Vue: Class<Component>) {
       )
     }
     propsDef.set = function () {
+      // 也不要尝试更改实例的props对象，同上
       warn(`$props is readonly.`, this)
     }
   }
+  // 在Vue的原型上添加$data，和$props
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
-  Vue.prototype.$set = set
-  Vue.prototype.$delete = del
+  Vue.prototype.$set = set    // 为Vue实例添加$set方法，接受三个参数，target，key，val
+  Vue.prototype.$delete = del // 为Vue实例添加$delete方法，接受三个参数，target，key，val
 
-  Vue.prototype.$watch = function (
+  Vue.prototype.$watch = function ( // 为Vue实例添加$watch方法，
     expOrFn: string | Function,
     cb: any,
     options?: Object
   ): Function {
     const vm: Component = this
-    if (isPlainObject(cb)) {
+    if (isPlainObject(cb)) {  // 看是否是对象数据类型
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
@@ -359,7 +362,7 @@ export function stateMixin (Vue: Class<Component>) {
         handleError(error, vm, `callback for immediate watcher "${watcher.expression}"`)
       }
     }
-    return function unwatchFn () {
+    return function unwatchFn () {  // watch返回值是 unwatch函数，就是取消监听
       watcher.teardown()
     }
   }

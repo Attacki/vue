@@ -67,7 +67,7 @@ export default class Watcher {
     this.cb = cb
     this.id = ++uid // uid for batching
     this.active = true
-    this.dirty = this.lazy // for lazy watchers
+    this.dirty = this.lazy // for lazy watchers 
     this.deps = []
     this.newDeps = []
     this.depIds = new Set()

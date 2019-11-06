@@ -198,23 +198,27 @@ export function defineReactive (
  * triggers change notification if the property doesn't
  * already exist.
  */
+// 为对象设置一个属性。如果这个属性不存在，那就需要添加新属性，并触发更改通知
 export function set (target: Array<any> | Object, key: any, val: any): any {
   if (process.env.NODE_ENV !== 'production' &&
-    (isUndef(target) || isPrimitive(target))
+    (isUndef(target) || isPrimitive(target))  // 判断是否定义或者是否是基本数据类型
   ) {
+    // 不能为undefined null 还有其他基本数据类型，添加响应式的属性
     warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
-  if (Array.isArray(target) && isValidArrayIndex(key)) {
+  if (Array.isArray(target) && isValidArrayIndex(key)) { // 判断是否是数组，并且key是否是一个正确的数组序号
     target.length = Math.max(target.length, key)
-    target.splice(key, 1, val)
+    target.splice(key, 1, val)  // 对新的值进行替换
     return val
   }
-  if (key in target && !(key in Object.prototype)) {
+  if (key in target && !(key in Object.prototype)) { // 对象自身的属性，而不是原型上的属性
     target[key] = val
     return val
   }
   const ob = (target: any).__ob__
   if (target._isVue || (ob && ob.vmCount)) {
+    // 不要直接给Vue实例的data添加响应式属性，只能添加静态属性
+    // 运行时- 提前在data选项中进行声明
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
       'at runtime - declare it upfront in the data option.'
@@ -225,8 +229,8 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     target[key] = val
     return val
   }
-  defineReactive(ob.value, key, val)
-  ob.dep.notify()
+  defineReactive(ob.value, key, val) // 重新为对象的响应式属性key绑定新的值val
+  ob.dep.notify() // 触发与该属性相关的所有更新
   return val
 }
 
@@ -240,6 +244,7 @@ export function del (target: Array<any> | Object, key: any) {
     warn(`Cannot delete reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
   if (Array.isArray(target) && isValidArrayIndex(key)) {
+    // 删除数组的元素
     target.splice(key, 1)
     return
   }
@@ -251,11 +256,11 @@ export function del (target: Array<any> | Object, key: any) {
     )
     return
   }
-  if (!hasOwn(target, key)) {
+  if (!hasOwn(target, key)) { // 如果不是对象自身的属性（如果是原型属性也无法删除），就无法删除
     return
   }
   delete target[key]
-  if (!ob) {
+  if (!ob) {  // 如果没有数据劫持对象，就不再寻找和触发与该属性相关的更新了
     return
   }
   ob.dep.notify()

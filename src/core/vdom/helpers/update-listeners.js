@@ -19,7 +19,8 @@ const normalizeEvent = cached((name: string): {
   handler?: Function,
   params?: Array<any>
 } => {
-  const passive = name.charAt(0) === '&'
+  // 根据name字段，来进行缓存
+  const passive = name.charAt(0) === '&'  // 如果绑定事件的时候有&，说明就是要
   name = passive ? name.slice(1) : name
   const once = name.charAt(0) === '~' // Prefixed last, checked first
   name = once ? name.slice(1) : name
@@ -50,6 +51,7 @@ export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component
   return invoker
 }
 
+// 更新时间监听对象列表
 export function updateListeners (
   on: Object,
   oldOn: Object,
@@ -59,12 +61,12 @@ export function updateListeners (
   vm: Component
 ) {
   let name, def, cur, old, event
-  for (name in on) {
+  for (name in on) {  // 这是要让新事件列表和旧事件列表对象合并
     def = cur = on[name]
     old = oldOn[name]
     event = normalizeEvent(name)
     /* istanbul ignore if */
-    if (__WEEX__ && isPlainObject(def)) {
+    if (__WEEX__ && isPlainObject(def)) { 
       cur = def.handler
       event.params = def.params
     }
