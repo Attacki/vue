@@ -1,5 +1,6 @@
 /* @flow */
 
+// 虚拟节点类
 export default class VNode {
   tag: string | void;
   data: VNodeData | void;
@@ -14,13 +15,13 @@ export default class VNode {
   parent: VNode | void; // component placeholder node
 
   // strictly internal
-  raw: boolean; // contains raw HTML? (server only)
-  isStatic: boolean; // hoisted static node
-  isRootInsert: boolean; // necessary for enter transition check
-  isComment: boolean; // empty comment placeholder?
-  isCloned: boolean; // is a cloned node?
-  isOnce: boolean; // is a v-once node?
-  asyncFactory: Function | void; // async component factory function
+  raw: boolean; // 包含处理过的html? (server only)
+  isStatic: boolean; // 提升静态节点
+  isRootInsert: boolean; // enter transition属性生效检查所必需的
+  isComment: boolean; // 空注释是否占位?
+  isCloned: boolean; // 被克隆出来的节点?
+  isOnce: boolean; // 是否是一次性节点?
+  asyncFactory: Function | void; // 异步组件工厂函数
   asyncMeta: Object | void;
   isAsyncPlaceholder: boolean;
   ssrContext: Object | void;
@@ -64,13 +65,14 @@ export default class VNode {
     this.isAsyncPlaceholder = false
   }
 
-  // DEPRECATED: alias for componentInstance for backwards compat.
+  // 废弃: 向后兼容组件的别名。
   /* istanbul ignore next */
   get child (): Component | void {
     return this.componentInstance
   }
 }
 
+// 创建一个空虚拟节点
 export const createEmptyVNode = (text: string = '') => {
   const node = new VNode()
   node.text = text
@@ -78,11 +80,13 @@ export const createEmptyVNode = (text: string = '') => {
   return node
 }
 
+// 创建文本虚拟节点
 export function createTextVNode (val: string | number) {
   return new VNode(undefined, undefined, undefined, String(val))
 }
 
-// optimized shallow clone
+// 浅克隆的优化，
+// 这被用在静态节点和插槽节点中，因为他们可能会在多次的渲染中被重用，克隆它们
 // used for static nodes and slot nodes because they may be reused across
 // multiple renders, cloning them avoids errors when DOM manipulations rely
 // on their elm reference.

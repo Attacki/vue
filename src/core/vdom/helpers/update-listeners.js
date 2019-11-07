@@ -51,7 +51,7 @@ export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component
   return invoker
 }
 
-// 更新时间监听对象列表
+// 更新事件监听对象列表
 export function updateListeners (
   on: Object,
   oldOn: Object,
