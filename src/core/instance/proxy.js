@@ -6,6 +6,7 @@ import { warn, makeMap, isNative } from '../util/index'
 let initProxy
 
 if (process.env.NODE_ENV !== 'production') {
+  // 这是被允许直接调用的全局属性
   const allowedGlobals = makeMap(
     'Infinity,undefined,NaN,isFinite,isNaN,' +
     'parseFloat,parseInt,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,' +
@@ -13,6 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
     'require' // for Webpack/Browserify
   )
 
+  // 没有定义，但是在模版渲染的时候用到了该属性或者函数
   const warnNonPresent = (target, key) => {
     warn(
       `Property or method "${key}" is not defined on the instance but ` +
@@ -24,6 +26,7 @@ if (process.env.NODE_ENV !== 'production') {
     )
   }
 
+  // 使用 $data.*** 来访问该属性，避免与Vue内部的属性发生冲突
   const warnReservedPrefix = (target, key) => {
     warn(
       `Property "${key}" must be accessed with "$data.${key}" because ` +
@@ -34,10 +37,12 @@ if (process.env.NODE_ENV !== 'production') {
     )
   }
 
+  // 环境中是否原生包含有Proxy
   const hasProxy =
     typeof Proxy !== 'undefined' && isNative(Proxy)
 
   if (hasProxy) {
+    // 避免覆盖config.keyCodes中的内置修饰符
     const isBuiltInModifier = makeMap('stop,prevent,self,ctrl,shift,alt,meta,exact')
     config.keyCodes = new Proxy(config.keyCodes, {
       set (target, key, value) {
@@ -52,6 +57,7 @@ if (process.env.NODE_ENV !== 'production') {
     })
   }
 
+  // 被代理对象的has代理陷阱函数   也就是in
   const hasHandler = {
     has (target, key) {
       const has = key in target
@@ -65,6 +71,7 @@ if (process.env.NODE_ENV !== 'production') {
     }
   }
 
+  // 
   const getHandler = {
     get (target, key) {
       if (typeof key === 'string' && !(key in target)) {

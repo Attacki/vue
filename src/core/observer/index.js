@@ -198,7 +198,7 @@ export function defineReactive (
  * triggers change notification if the property doesn't
  * already exist.
  */
-// 为对象设置一个属性。如果这个属性不存在，那就需要添加新属性，并触发更改通知
+// 为对象设置属性
 export function set (target: Array<any> | Object, key: any, val: any): any {
   if (process.env.NODE_ENV !== 'production' &&
     (isUndef(target) || isPrimitive(target))  // 判断是否定义或者是否是基本数据类型
