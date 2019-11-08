@@ -3,8 +3,8 @@
 // can we use __proto__?
 export const hasProto = '__proto__' in {}
 
-// Browser environment sniffing
-export const inBrowser = typeof window !== 'undefined'
+// 浏览器环境嗅探
+export const inBrowser = typeof window !== 'undefined'  // 浏览器
 export const inWeex = typeof WXEnvironment !== 'undefined' && !!WXEnvironment.platform
 export const weexPlatform = inWeex && WXEnvironment.platform.toLowerCase()
 export const UA = inBrowser && window.navigator.userAgent.toLowerCase()

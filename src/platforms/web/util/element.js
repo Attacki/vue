@@ -55,21 +55,22 @@ export function getTagNamespace (tag: string): ?string {
 
 // element缓存列表
 const unknownElementCache = Object.create(null)
-// 判断标签是否是新建的tag  例如自定义组件名称，就是另一个tag
+// 判断标签是否是新建的tag  例如自定义组件名称
 export function isUnknownElement (tag: string): boolean {
-  /* istanbul ignore if */
+  // 在字符串模板或单文件组件中使用大小写组件名可以，但是在html中dom模版中写大小写组件名就不行
   if (!inBrowser) {
     return true
   }
   if (isReservedTag(tag)) {
     return false
   }
+  // 会对tag名称进行小写处理
   tag = tag.toLowerCase()
   /* istanbul ignore if */
-  if (unknownElementCache[tag] != null) {
+  if (unknownElementCache[tag] != null) { // 如果已经存在了这个tag 就直接返回它的状态
     return unknownElementCache[tag]
   }
-  const el = document.createElement(tag)
+  const el = document.createElement(tag)  // 不存在就创建该tag
   if (tag.indexOf('-') > -1) {
     // http://stackoverflow.com/a/28210364/1070244
     return (unknownElementCache[tag] = (
@@ -81,4 +82,5 @@ export function isUnknownElement (tag: string): boolean {
   }
 }
 
+// 判断是否文本输入类型的input
 export const isTextInputType = makeMap('text,number,password,search,email,tel,url')

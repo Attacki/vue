@@ -240,7 +240,7 @@ export function genStaticKeys (modules: Array<ModuleOptions>): string {
  * if they are plain objects, do they have the same shape?
  */
 
-// 检查两个值是否是大致相等，如果都是对象数据类型，是否有相同的属性值，必须
+// 检查两个值是否大致相等，如果都是对象数据类型，是否有相同的属性值，必须
 export function looseEqual (a: any, b: any): boolean {
   if (a === b) return true
   const isObjectA = isObject(a)

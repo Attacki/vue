@@ -48,9 +48,9 @@ export function updateComponentListeners (
   listeners: Object,
   oldListeners: ?Object
 ) {
-  target = vm
+  target = vm  // 因为 add remove 等等都使用到了target变量，所以需要在父级作用域进行指定。
   updateListeners(listeners, oldListeners || {}, add, remove, createOnceHandler, vm)
-  target = undefined
+  target = undefined  // 事件监听列表更新之后，释放target变量
 }
 
 export function eventsMixin (Vue: Class<Component>) {
@@ -131,18 +131,18 @@ export function eventsMixin (Vue: Class<Component>) {
           `Event "${lowerCaseEvent}" is emitted in component ` +
           `${formatComponentName(vm)} but the handler is registered for "${event}". ` +
           `Note that HTML attributes are case-insensitive and you cannot use ` +  // 因为html是不区分大小写的
-          `v-on to listen to camelCase events when using in-DOM templates. ` +    //  不能使用v-on来监听 驼峰类的事件
-          `You should probably use "${hyphenate(event)}" instead of "${event}".`  //使用 kebab-case 来表示自定义事件名
+          `v-on to listen to camelCase events when using in-DOM templates. ` +    // 不能使用v-on来监听 驼峰类的事件
+          `You should probably use "${hyphenate(event)}" instead of "${event}".`  // 使用 kebab-case 来命名自定义事件名
         )
       }
     }
-    let cbs = vm._events[event]
+    let cbs = vm._events[event] // 找到该事件的回调函数， 所以啊 同一个事件可能有多个回调函数
     if (cbs) {
       cbs = cbs.length > 1 ? toArray(cbs) : cbs
-      const args = toArray(arguments, 1)
+      const args = toArray(arguments, 1)  // 把函数接收的参数从第一个开始搜集，并转为数组
       const info = `event handler for "${event}"`
       for (let i = 0, l = cbs.length; i < l; i++) {
-        invokeWithErrorHandling(cbs[i], vm, args, vm, info)
+        invokeWithErrorHandling(cbs[i], vm, args, vm, info) // 对函数进行调用，并捕获可能发生的错误
       }
     }
     return vm

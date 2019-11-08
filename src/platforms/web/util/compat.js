@@ -2,7 +2,8 @@
 
 import { inBrowser } from 'core/util/index'
 
-// check whether current browser encodes a char inside attribute values
+// 该文件是检查当前浏览器是否在属性值内编码字符
+
 let div
 function getShouldDecode (href: boolean): boolean {
   div = div || document.createElement('div')
@@ -10,7 +11,7 @@ function getShouldDecode (href: boolean): boolean {
   return div.innerHTML.indexOf('&#10;') > 0   // &#10;是换行字符
 }
 
-// #3663: IE encodes newlines inside attribute values while other browsers don't
+// #3663: IE在属性值中也会编码新行，而其他浏览器则不会
 export const shouldDecodeNewlines = inBrowser ? getShouldDecode(false) : false
-// #6828: chrome encodes content in a[href]
+// #6828: chrome在a标签的href属性中编码内容
 export const shouldDecodeNewlinesForHref = inBrowser ? getShouldDecode(true) : false

@@ -2,6 +2,7 @@
  * Not type checking this file because flow doesn't like attaching
  * properties to Elements.
  */
+// 不检查此文件的类型，因为flow不喜欢将属性附加到元素。
 
 import { isTextInputType } from 'web/util/element'
 import { looseEqual, looseIndexOf } from 'shared/util'

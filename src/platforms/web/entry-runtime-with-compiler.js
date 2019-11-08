@@ -15,6 +15,7 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 
+// 之所以重写$mount，就是因为不同的平台挂载dom的方式不同
 // 如果没有传递el属性，就要自己使用$mount方法进行挂载
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (

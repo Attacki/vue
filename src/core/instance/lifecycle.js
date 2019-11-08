@@ -138,37 +138,38 @@ export function lifecycleMixin (Vue: Class<Component>) {
   }
 }
 
+// 挂载组件
 export function mountComponent (
   vm: Component,
   el: ?Element,
   hydrating?: boolean
 ): Component {
   vm.$el = el
-  if (!vm.$options.render) {
+  if (!vm.$options.render) { // 如果组件的render函数不存在
     vm.$options.render = createEmptyVNode
     if (process.env.NODE_ENV !== 'production') {
       /* istanbul ignore if */
       if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
         vm.$options.el || el) {
-        warn(
+        warn( // 使用的vue版本没有compiler工具，使用其他构建版本的vue
           'You are using the runtime-only build of Vue where the template ' +
           'compiler is not available. Either pre-compile the templates into ' +
           'render functions, or use the compiler-included build.',
           vm
         )
       } else {
-        warn(
+        warn( // 模版或者render函数没有被定义
           'Failed to mount component: template or render function not defined.',
           vm
         )
       }
     }
   }
-  callHook(vm, 'beforeMount')
+  callHook(vm, 'beforeMount') // 在挂载前调用 beforeMount的回调函数
 
   let updateComponent
   /* istanbul ignore if */
-  if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+  if (process.env.NODE_ENV !== 'production' && config.performance && mark) {  // 开发模式下的
     updateComponent = () => {
       const name = vm._name
       const id = vm._uid

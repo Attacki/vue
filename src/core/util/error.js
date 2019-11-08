@@ -33,6 +33,7 @@ export function handleError (err: Error, vm: any, info: string) {
   }
 }
 
+// 对函数进行调用，并捕获可能发生的错误
 export function invokeWithErrorHandling (
   handler: Function,
   context: any,
@@ -42,7 +43,7 @@ export function invokeWithErrorHandling (
 ) {
   let res
   try {
-    res = args ? handler.apply(context, args) : handler.call(context)
+    res = args ? handler.apply(context, args) : handler.call(context) // 调用回调函数，有参数就用apply，没有就用call
     if (res && !res._isVue && isPromise(res) && !res._handled) {
       res.catch(e => handleError(e, vm, info + ` (Promise/async)`))
       // issue #9511
