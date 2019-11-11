@@ -40,7 +40,7 @@ export default ({
    * Option merge strategies (used in core/util/options)
    */
   // $flow-disable-line
-  // 
+  // 合并策略
   optionMergeStrategies: Object.create(null),
 
   // 取消警告

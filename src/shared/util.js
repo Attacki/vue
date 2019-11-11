@@ -153,7 +153,7 @@ export const capitalize = cached((str: string): string => {
  * Hyphenate a camelCase string.
  */
 
-//  将字符串转化为 kebab-case 表示
+//  将字符串中的所有大写字母转化为 kebab-case 表示  例如 'bindChangeStatus' => 'bind-change-status'
 const hyphenateRE = /\B([A-Z])/g  //正则中\b是单词边界匹配符，\B是非单词边界匹配符，只要不是数字，字母或者下划线都算一个边界
 export const hyphenate = cached((str: string): string => {
   return str.replace(hyphenateRE, '-$1').toLowerCase()
