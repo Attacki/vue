@@ -44,6 +44,8 @@ export class Observer {
     this.dep = new Dep()
     this.vmCount = 0
     def(value, '__ob__', this)
+
+    // 判断当前value是不是数组或者Object
     if (Array.isArray(value)) {
       if (hasProto) {
         protoAugment(value, arrayMethods)
@@ -113,6 +115,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   }
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+    // 有缓存，ob就赋值为缓存
     ob = value.__ob__
   } else if (
     shouldObserve &&
@@ -121,6 +124,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
     Object.isExtensible(value) &&
     !value._isVue
   ) {
+    // 没有就创建一个
     ob = new Observer(value)
   }
   if (asRootData && ob) {
@@ -150,20 +154,26 @@ export function defineReactive (
   const getter = property && property.get
   const setter = property && property.set
   if ((!getter || setter) && arguments.length === 2) {
+    // 如果本函数调用时，没给定val，需要读取一下val
     val = obj[key]
   }
 
+  // 递归的响应式处理
   let childOb = !shallow && observe(val)
+  // 拦截
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
       if (Dep.target) {
+        // 加入到dep去管理watcher
         dep.depend()
         if (childOb) {
+          // 如果存在子对象，就要把当前watch也加入到子对象的dep里面去
           childOb.dep.depend()
           if (Array.isArray(value)) {
+            // 如果是数组，要特殊处理
             dependArray(value)
           }
         }
@@ -187,6 +197,7 @@ export function defineReactive (
       } else {
         val = newVal
       }
+      // 如果之前是'str'，现在变成{foo:'str'}
       childOb = !shallow && observe(newVal)
       dep.notify()
     }

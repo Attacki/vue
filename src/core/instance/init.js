@@ -49,12 +49,12 @@ export function initMixin (Vue: Class<Component>) {
     }
     // expose real self
     vm._self = vm
-    initLifecycle(vm) // 初始化生命周期函数
-    initEvents(vm)    // 初始化事件绑定
-    initRender(vm)    // 初始化渲染Dom
+    initLifecycle(vm) // 初始化生命周期函数 $parent $children....
+    initEvents(vm)    // 初始化事件绑定监听器
+    initRender(vm)    // 定义render函数
     callHook(vm, 'beforeCreate')  // 调用beforeCreate钩子函数
     initInjections(vm) // 在data/props之前 处理injections
-    initState(vm)   // 
+    initState(vm)   // 初始化组件的各种数据 data computed watch props methods
     initProvide(vm) // 在data/props之后 处理provide
     callHook(vm, 'created') // 调用created钩子函数
 

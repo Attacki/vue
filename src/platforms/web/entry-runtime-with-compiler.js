@@ -34,12 +34,13 @@ Vue.prototype.$mount = function (
   // 获取用户传入的实例属性参数
   const options = this.$options
   
+  // 若不存在render选项则将template/el的设置转换为render函数
   // 根据template或者el，获取内容字符串，并且转换成渲染函数
   if (!options.render) {
     let template = options.template
     if (template) {
       if (typeof template === 'string') {
-        // 如果是字符串，并且是dom的id属性
+        // 如果是字符串，并且是dom的id属性，就根据id去获取模版
         if (template.charAt(0) === '#') {
           template = idToTemplate(template)
           /* istanbul ignore if */
@@ -91,6 +92,7 @@ Vue.prototype.$mount = function (
       }
     }
   }
+  // 将之前的mount函数再次执行一次
   return mount.call(this, el, hydrating)
 }
 

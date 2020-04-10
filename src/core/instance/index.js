@@ -19,10 +19,10 @@ function Vue (options) {
 }
 
 // 为机甲内置该有的配置，data，props，state，event等等
-initMixin(Vue)
-stateMixin(Vue)
-eventsMixin(Vue)
-lifecycleMixin(Vue)
-renderMixin(Vue)
+initMixin(Vue)      //这里实现了上方的_init初始化方法
+stateMixin(Vue)     // 实现$set $del $watch
+eventsMixin(Vue)    // 实现$on $off $emit $once
+lifecycleMixin(Vue) // 实现_update $forceupdate $destory 
+renderMixin(Vue)    // 
 
 export default Vue

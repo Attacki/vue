@@ -144,10 +144,11 @@ function initData (vm: Component) {
         vm
       )
     } else if (!isReserved(key)) {
+      // data:{foo:'foo'} 代理到vm实例， vm.foo
       proxy(vm, `_data`, key)
     }
   }
-  // observe data
+  // observe data 数据劫持
   observe(data, true /* asRootData */)
 }
 

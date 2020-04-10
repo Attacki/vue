@@ -19,6 +19,7 @@ export function initInjections (vm: Component) {
     toggleObserving(false)
     Object.keys(result).forEach(key => {
       /* istanbul ignore else */
+      // 由此可知 父组件的inject的数据是响应式的
       if (process.env.NODE_ENV !== 'production') {
         defineReactive(vm, key, result[key], () => {
           warn(
