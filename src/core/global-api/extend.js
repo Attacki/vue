@@ -9,18 +9,20 @@ export function initExtend (Vue: GlobalAPI) {
    * Each instance constructor, including Vue, has a unique
    * cid. This enables us to create wrapped "child
    * constructors" for prototypal inheritance and cache them.
+   * 每一个实例构造函数，包括Vue在内，都有一个唯一的cid，这使我们能通过原型继承，来创建“子构造函数”，并且缓存它们
    */
-  Vue.cid = 0
+  Vue.cid = 0 //Vue老大的cid肯定是第一个咯
   let cid = 1
 
   /**
    * Class inheritance
+   * 类的继承
    */
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
     const Super = this
     const SuperId = Super.cid
-    const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
+    const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {}) //
     if (cachedCtors[SuperId]) {
       return cachedCtors[SuperId]
     }
@@ -34,7 +36,7 @@ export function initExtend (Vue: GlobalAPI) {
       this._init(options)
     }
     Sub.prototype = Object.create(Super.prototype)
-    Sub.prototype.constructor = Sub
+    Sub.prototype.constructor = Sub // 子组件的构造函数指向自身
     Sub.cid = cid++
     Sub.options = mergeOptions(
       Super.options,

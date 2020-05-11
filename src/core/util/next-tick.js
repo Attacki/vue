@@ -12,6 +12,7 @@ let pending = false
 
 function flushCallbacks () {
   pending = false
+  // 深copy，防止后面的回调继续加入列表
   const copies = callbacks.slice(0)
   callbacks.length = 0
   for (let i = 0; i < copies.length; i++) {
@@ -98,6 +99,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
     }
   })
   if (!pending) {
+    // 如果pending为true，说明上一个回调列表正在挨个执行，不要进入下一次的更新
     pending = true
     timerFunc()
   }
